@@ -90,12 +90,20 @@ jobs:
             git fetch origin
             git reset --hard origin/main
 
+            echo "🧹 Cleaning previous installations..."
+            rm -rf node_modules/
+            rm -f package-lock.json
+
             echo "📦 Installing dependencies with Yarn..."
             yarn install
 
             echo "🔧 Ensuring Express v4 compatibility..."
             yarn remove express
             yarn add express@^4.21.0
+
+            echo "🧹 Clearing yarn and npm cache..."
+            yarn cache clean --force
+            npm cache clean --force
 
             echo "🔨 Building project..."
             npm run build
