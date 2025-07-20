@@ -40,13 +40,27 @@ jobs:
             echo "Memory usage: $(free -h | grep Mem)"
             echo ""
             echo "📂 Project directory check:"
-            if [ -d "~/blurfin-intro" ]; then
-              echo "✅ Project directory exists"
+            echo "Home directory contents:"
+            ls -la ~/
+            echo ""
+            echo "Checking project directory paths:"
+            echo "~/blurfin-intro exists: $([ -d ~/blurfin-intro ] && echo 'YES' || echo 'NO')"
+            echo "/home/ubuntu/blurfin-intro exists: $([ -d /home/ubuntu/blurfin-intro ] && echo 'YES' || echo 'NO')"
+            echo ""
+            if [ -d "/home/ubuntu/blurfin-intro" ]; then
+              echo "✅ Project directory exists at /home/ubuntu/blurfin-intro"
+              cd /home/ubuntu/blurfin-intro
+              echo "Current branch: $(git branch --show-current)"
+              echo "Last commit: $(git log --oneline -1)"
+            elif [ -d "~/blurfin-intro" ]; then
+              echo "✅ Project directory exists at ~/blurfin-intro"
               cd ~/blurfin-intro
               echo "Current branch: $(git branch --show-current)"
               echo "Last commit: $(git log --oneline -1)"
             else
-              echo "❌ Project directory not found"
+              echo "❌ Project directory not found in both locations"
+              echo "Let's check if there are any similar directories:"
+              find /home/ubuntu -maxdepth 2 -name "*blurfin*" -type d 2>/dev/null || echo "No blurfin directories found"
               exit 1
             fi
             echo ""
@@ -65,7 +79,12 @@ jobs:
           timeout: 300s
           command_timeout: 15m
           script: |
-            cd ~/blurfin-intro
+            # Navigate to project directory
+            if [ -d "/home/ubuntu/blurfin-intro" ]; then
+              cd /home/ubuntu/blurfin-intro
+            else
+              cd ~/blurfin-intro
+            fi
 
             echo "📥 Pulling latest changes from main branch..."
             git fetch origin
