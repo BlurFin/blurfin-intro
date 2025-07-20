@@ -37,7 +37,7 @@ body {
   margin-bottom: -1rem;
   opacity: 0;
   transform: translateY(20px);
-  animation: fadeInUp 0.8s ease-out forwards;
+  animation: fadeInUp 0.8s ease-out 0.4s forwards;
 }
 
 @keyframes fadeInUp {
@@ -55,7 +55,7 @@ body {
   font-weight: 500;
   opacity: 0;
   transform: translateY(20px);
-  animation: fadeInUp 0.8s ease-out 0.3s forwards;
+  animation: fadeInUp 0.8s ease-out 0.8s forwards;
 }
 
 .contact-form {
@@ -64,7 +64,7 @@ body {
   gap: 1rem;
   opacity: 0;
   transform: translateY(20px);
-  animation: fadeInUp 0.8s ease-out 1s forwards;
+  animation: fadeInUp 0.8s ease-out 1.4s forwards;
 }
 
 .input-group {
