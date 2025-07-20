@@ -11,14 +11,17 @@ function App() {
     setIsLoading(true)
 
     try {
-      // 서버리스 함수로 이메일 전송
-      const response = await fetch('/api/send-email', {
+      const apiUrl = process.env.NODE_ENV === 'production' 
+        ? '/api/send-email'
+        : 'http://localhost:5000/api/send-email';
+        
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: message // 줄바꿈 자동 보존됨
+          message: message
         })
       })
 

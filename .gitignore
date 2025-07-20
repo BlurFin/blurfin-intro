@@ -23,4 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
-Vercel_배포_가이드.md
+로컬개발_배포_가이드.md
+
+# Environment variables
+.env
+.env.local
+.env.production
