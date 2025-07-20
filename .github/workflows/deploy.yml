@@ -16,12 +16,54 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: 🔍 Validate Secrets and Connection
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          timeout: 60s
+          command_timeout: 2m
+          script: |
+            echo "🔍 Validating server connection and secrets..."
+            echo "✅ HOST: ${{ secrets.HOST }} - Connection successful"
+            echo "✅ USERNAME: ${{ secrets.USERNAME }} - Login successful"
+            echo "✅ SSH_KEY: Valid and working"
+            echo ""
+            echo "📋 Server Information:"
+            echo "Current user: $(whoami)"
+            echo "Current directory: $(pwd)"
+            echo "Server time: $(date)"
+            echo "Server uptime: $(uptime)"
+            echo "Disk usage: $(df -h / | tail -1)"
+            echo "Memory usage: $(free -h | grep Mem)"
+            echo ""
+            echo "📂 Project directory check:"
+            if [ -d "~/blurfin-intro" ]; then
+              echo "✅ Project directory exists"
+              cd ~/blurfin-intro
+              echo "Current branch: $(git branch --show-current)"
+              echo "Last commit: $(git log --oneline -1)"
+            else
+              echo "❌ Project directory not found"
+              exit 1
+            fi
+            echo ""
+            echo "🔧 PM2 status check:"
+            pm2 describe blurfin-server > /dev/null 2>&1 && echo "✅ PM2 process exists" || echo "⚠️ PM2 process not found (will be created)"
+            echo ""
+            echo "🎯 All validation checks passed! Ready for deployment."
+
       - name: 🚀 Deploy to Server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
+          port: 22
+          timeout: 300s
+          command_timeout: 15m
           script: |
             cd ~/blurfin-intro
 
@@ -29,8 +71,12 @@ jobs:
             git fetch origin
             git reset --hard origin/main
 
-            echo "📦 Installing dependencies..."
-            npm ci --production
+            echo "📦 Installing dependencies with Yarn..."
+            yarn install
+
+            echo "🔧 Ensuring Express v4 compatibility..."
+            yarn remove express
+            yarn add express@^4.21.0
 
             echo "🔨 Building project..."
             npm run build
@@ -40,5 +86,6 @@ jobs:
 
             echo "✅ Deployment completed successfully!"
             pm2 status
+            pm2 logs blurfin-server --lines 5 --nostream
 
             echo "🌐 Site is now live at https://blurfin.com"
